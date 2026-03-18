@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: smart-airport-parking
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false        # paste this manually in the Render dashboard
+      - key: DB_NAME
+        value: airport_parking

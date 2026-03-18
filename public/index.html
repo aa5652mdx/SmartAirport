@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Airport Parking & Slot Booking System</title>
+    <meta
+      name="description"
+      content="AI-assisted airport parking and slot booking with congestion forecasting, arrival guidance, and parking allocation."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700&family=Work+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/airport.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="#top">
+          <span class="brand-mark">SAP</span>
+          <span class="brand-copy">
+            <strong>Smart Airport Parking</strong>
+            <small>Slot booking and demand planning</small>
+          </span>
+        </a>
+
+        <nav class="topbar-nav" aria-label="Primary">
+          <a href="#booking">Booking</a>
+          <a href="#operations">Operations</a>
+        </nav>
+      </header>
+
+      <main id="top">
+        <section class="hero reveal">
+          <div class="hero-copy">
+            <p class="eyebrow">Individual Project Concept</p>
+            <h1>Airport parking planned around forecasted demand, not guesswork.</h1>
+            <p class="hero-text">
+              This prototype combines advance booking, congestion prediction, arrival guidance, and
+              intelligent parking allocation in one streamlined dashboard. It is ready for MongoDB,
+              environment variables, and deployment platforms such as Render.
+            </p>
+
+            <div class="hero-actions">
+              <a class="button" href="#booking">Plan a booking</a>
+              <a class="button button-muted" href="#operations">View operations</a>
+            </div>
+          </div>
+
+          <div class="hero-panel">
+            <div class="hero-panel-row">
+              <span class="label">Storage</span>
+              <span class="pill" id="storageMode">Loading</span>
+            </div>
+            <div class="hero-panel-row">
+              <span class="label">Live congestion</span>
+              <strong id="heroCongestion">--</strong>
+            </div>
+            <div class="hero-panel-row">
+              <span class="label">Next peak window</span>
+              <strong id="heroPeakWindow">--</strong>
+            </div>
+            <p class="hero-panel-note">
+              Forecasting blends current bookings, flight activity, seasonal pressure, and expected
+              landside delays.
+            </p>
+          </div>
+        </section>
+
+        <section class="stat-strip reveal" aria-label="Summary metrics">
+          <article class="stat-chip">
+            <span>Bookings today</span>
+            <strong id="bookingsToday">0</strong>
+          </article>
+          <article class="stat-chip">
+            <span>Live occupancy</span>
+            <strong id="liveOccupancy">0%</strong>
+          </article>
+          <article class="stat-chip">
+            <span>Spaces available</span>
+            <strong id="availableSpaces">0</strong>
+          </article>
+          <article class="stat-chip">
+            <span>Expected delay</span>
+            <strong id="expectedDelay">0 mins</strong>
+          </article>
+        </section>
+
+        <section class="workspace" id="booking">
+          <article class="panel panel-form reveal">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Parking Booking</p>
+                <h2>Reserve a slot in advance</h2>
+              </div>
+              <span class="panel-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M7 5h10l2 4v8h-2v2H7v-2H5V9l2-4Zm1.3 2L7.4 9h9.2l-.9-2H8.3Zm.7 5a2 2 0 1 0 .1 4 2 2 0 0 0-.1-4Zm6 0a2 2 0 1 0 .1 4 2 2 0 0 0-.1-4Z"></path>
+                </svg>
+              </span>
+            </div>
+
+            <form id="bookingForm" class="booking-form">
+              <label>
+                <span>Full name</span>
+                <input type="text" name="fullName" placeholder="Amina Rahman" required />
+              </label>
+
+              <label>
+                <span>Email address</span>
+                <input type="email" name="email" placeholder="name@example.com" required />
+              </label>
+
+              <label>
+                <span>Vehicle registration</span>
+                <input type="text" name="vehicleReg" placeholder="AB12 CDE" required />
+              </label>
+
+              <label>
+                <span>Flight number</span>
+                <input type="text" name="flightNumber" placeholder="BA204" required />
+              </label>
+
+              <label>
+                <span>Terminal</span>
+                <select name="terminal" required>
+                  <option value="North">North</option>
+                  <option value="South">South</option>
+                  <option value="East">East</option>
+                  <option value="West">West</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Route type</span>
+                <select name="routeType" id="routeType" required>
+                  <option value="domestic">Domestic</option>
+                  <option value="international">International</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Flight departure</span>
+                <input type="datetime-local" name="departureTime" id="departureTime" required />
+              </label>
+
+              <label>
+                <span>Return time</span>
+                <input type="datetime-local" name="returnTime" id="returnTime" required />
+              </label>
+
+              <button class="button button-wide" type="submit" id="bookingButton">
+                Book parking slot
+              </button>
+            </form>
+          </article>
+
+          <aside class="panel panel-result reveal" id="bookingResultPanel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Recommendation</p>
+                <h2>Arrival window and allocation</h2>
+              </div>
+              <span class="panel-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M12 3 4 7v6c0 4.5 3.4 7.8 8 8 4.6-.2 8-3.5 8-8V7l-8-4Zm0 4.2 4.8 2.3v3.6c0 3-2 5.3-4.8 5.8-2.8-.5-4.8-2.8-4.8-5.8V9.5L12 7.2Zm-.9 3.2v3.8h5.5v-1.9H13v-1.9h2.6V8.5h-4.5Z"></path>
+                </svg>
+              </span>
+            </div>
+
+            <div class="result-shell">
+              <p class="result-status" id="resultStatus">Awaiting a booking submission.</p>
+              <h3 id="resultTitle">The system will calculate the best arrival window automatically.</h3>
+              <p class="result-copy" id="resultCopy">
+                Enter a flight and return time to generate congestion-aware arrival guidance and a
+                parking slot allocation.
+              </p>
+
+              <div class="result-grid">
+                <article class="result-card">
+                  <span>Recommended arrival</span>
+                  <strong id="arrivalWindowValue">--</strong>
+                </article>
+                <article class="result-card">
+                  <span>Allocated zone</span>
+                  <strong id="allocationValue">--</strong>
+                </article>
+                <article class="result-card">
+                  <span>Slot code</span>
+                  <strong id="slotValue">--</strong>
+                </article>
+                <article class="result-card">
+                  <span>Forecasted pressure</span>
+                  <strong id="congestionValue">--</strong>
+                </article>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <section class="operations" id="operations">
+          <article class="panel reveal">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Demand Overview</p>
+                <h2>Live operations snapshot</h2>
+              </div>
+              <span class="panel-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M4 18h16v2H4v-2Zm2-8h3v6H6v-6Zm5-4h3v10h-3V6Zm5 2h3v8h-3V8Z"></path>
+                </svg>
+              </span>
+            </div>
+            <div class="timeline-chart" id="timelineChart"></div>
+          </article>
+
+          <article class="panel reveal">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Zone Utilisation</p>
+                <h2>Parking allocation balance</h2>
+              </div>
+              <span class="panel-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M3 6h18v4H3V6Zm0 8h18v4H3v-4Zm3-6v6m6-6v6m6-6v6"></path>
+                </svg>
+              </span>
+            </div>
+            <div class="zone-list" id="zoneList"></div>
+          </article>
+
+          <article class="panel reveal">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Peak Travel Days</p>
+                <h2>Forecast by day</h2>
+              </div>
+              <span class="panel-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M7 2v3M17 2v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"></path>
+                </svg>
+              </span>
+            </div>
+            <div class="peak-list" id="peakList"></div>
+          </article>
+
+          <article class="panel reveal">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Recent Bookings</p>
+                <h2>Latest parking reservations</h2>
+              </div>
+              <span class="panel-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M8 4h8v2h3a1 1 0 0 1 1 1v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a1 1 0 0 1 1-1h3V4Zm2 2h4V6h-4v0Zm-2 5h8v2H8v-2Zm0 4h5v2H8v-2Z"></path>
+                </svg>
+              </span>
+            </div>
+            <div class="booking-list" id="recentBookingList"></div>
+          </article>
+        </section>
+
+        <section class="panel panel-insights reveal">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Decision Support</p>
+              <h2>Operational insights</h2>
+            </div>
+          </div>
+          <div class="insight-list" id="insightList"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/airport.js"></script>
+  </body>
+</html>
