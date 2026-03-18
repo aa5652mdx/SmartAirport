@@ -134,7 +134,7 @@ function renderPeakDays(days) {
     item.className = "peak-row";
     item.innerHTML = `
       <strong>${day.label}</strong>
-      <span>Demand score ${day.demandScore} 路 ${formatPercentage(day.utilisationRate)}</span>
+      <span>Demand score ${day.demandScore} - ${formatPercentage(day.utilisationRate)}</span>
     `;
     peakList.appendChild(item);
   });
